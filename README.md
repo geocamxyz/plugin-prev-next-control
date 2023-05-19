@@ -29,14 +29,14 @@ The .js file can be imported into your .html file using the below code (This can
 ```
 The plugin can be imported via a module script or using the npm package and using the below import statement.
 ```
-import { urlFragments } from "prev-next-control"
+import { prevNextControls } from "prev-next-control"
 ```
 ### Setup:
 The plugin can then be added into the plugins array for the init of the viewer class as seen below
 ```
 const viewer = new geocamViewer(node, {
 	plugins: [
-        new urlFragments({stores: ['fov','facing','horizon','shot','capture','visible','left','top','width','height','mode','autorotate','autobrightness','zoom','center','camLat','camLng','camAlt','camHdg','camTilt','camFov']}),
+        new prevNextControls(),
       ],
 });
 ```
