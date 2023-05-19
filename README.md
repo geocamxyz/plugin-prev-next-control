@@ -6,7 +6,7 @@ npm install 'https://gitpkg.now.sh/geocamxyz/plugin-prev-next-control/src?v1.0.0
 ```
 or for a particual commit version:
 ```
-npm install 'https://gitpkg.now.sh/geocamxyz/plugin-prev-next-controlsrc?25b9da6'
+npm install 'https://gitpkg.now.sh/geocamxyz/plugin-prev-next-controlsrc?ca628f1'
 ```
 ### Import Map (External Loading):
 ```
@@ -14,7 +14,7 @@ https://cdn.jsdelivr.net/gh/geocamxyz/plugin-prev-next-control@v1.0.0/dist/prev-
 ```
 or for a particual commit version:
 ```
-https://cdn.jsdelivr.net/gh/geocamxyz/plugin-prev-next-control@25b9da6/dist/prev-next-control.js
+https://cdn.jsdelivr.net/gh/geocamxyz/plugin-prev-next-control@ca628f1/dist/prev-next-control.js
 ```
 ### Usage:
 The .js file can be imported into your .html file using the below code (This can be ignored if your using the NPM package).
