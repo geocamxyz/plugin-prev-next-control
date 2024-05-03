@@ -46,8 +46,10 @@ const store = function (val) {
   return fn;
 };
 
-export const prevNextControls = function (captures = null) {
-  let viewer, prev, next, currentIndex, shotGroups, currentShot;
+export const prevNextControl = function () {
+  let viewer, prev, next, prevUnsub, nextUnsub;
+  this.prev = store();
+  this.next = store();
 
   const STYLES = `
 
@@ -67,98 +69,69 @@ export const prevNextControls = function (captures = null) {
 
   injectStyle("prev-next-controls", STYLES);
 
-  const updateButtons = () => {
-    if (currentIndex === null) {
-      prev.classList.add("geocam-nav-button-disabled");
-      next.classList.add("geocam-nav-button-disabled");
-    } else {
-      if (currentIndex === 0) {
-        prev.classList.add("geocam-nav-button-disabled");
-      } else {
-        prev.classList.remove("geocam-nav-button-disabled");
-      }
-      if (currentIndex === shotGroups.length - 1) {
-        next.classList.add("geocam-nav-button-disabled");
-      } else {
-        next.classList.remove("geocam-nav-button-disabled");
-      }
-    }
-  };
-
-  const move = (amt) => {
-    if (currentIndex !== null) {
-      currentIndex += amt;
-      if (currentIndex < 0) {
-        currentIndex = 0;
-      } else if (currentIndex > shotGroups.length - 1) {
-        currentIndex = shotGroups.length - 1;
-      }
-      currentShot = shotGroups[currentIndex];
-      console.log("current is", currentShot);
-      viewer.capture(currentShot.attributes.capture);
-      viewer.shot(currentShot.attributes.shot);
-      updateButtons();
-    }
-  };
-
   const prevClick = (e) => {
-    move(-1);
+    const prev = this.prev();
+    if (prev) {
+      viewer.shot(prev);
+    }
   };
 
   const nextClick = (e) => {
-    move(1);
-  };
-
-  const setShots = (features) => {
-    console.log("set shots", features);
-    if (!Array.isArray(features))
-      console.error(
-        "Prev-Next-Controls plugin - you must pass an ordered array of shots"
-      );
-    if (features.length < 1) {
-      shotGroups = [];
-      currentIndex = null;
-    } else {
-      shotGroups = features;
-        // update currentIndex to match if it's there
-        // enable or disable buttons accordingly
-        const idx = shotGroups.findIndex(
-          (el) =>
-            el.attributes.shot === viewer.shot() &&
-            el.attributes.capture === viewer.capture()
-        );
-        currentIndex = idx < 0 ? null : idx;
-        currentShot =currentIndex !== null ? shotGroups[currentIndex] : null;
+    const next = this.next();
+    if (next) {
+      viewer.shot(next);
     }
-    updateButtons();
-    return this;
   };
-
-  this.shots = setShots;
-  this.currentShot = () => { return currentShot};
 
   this.init = function (geocamViewer) {
     viewer = geocamViewer;
     prev = node("DIV", {
       class:
-        "geocam-nav-button geocam-prev-button geocam-viewer-control-button",
+        "geocam-nav-button geocam-prev-button geocam-viewer-control-button geocam-nav-button-disabled",
       title: "go to previous shot in sequence",
     });
     viewer.addControl(prev, "bottom");
     next = node("DIV", {
       class:
-        "geocam-nav-button geocam-next-button geocam-viewer-control-button",
+        "geocam-nav-button geocam-next-button geocam-viewer-control-button geocam-nav-button-disabled",
       title: "go to next shot in sequence",
     });
     viewer.addControl(next, "bottom");
     prev.addEventListener("click", prevClick, false);
     next.addEventListener("click", nextClick, false);
-    if (captures) {
-      setShots(captures);
-    }
+
+    prevUnsub = this.prev((val) => {
+      if (val) {
+        prev.classList.remove("geocam-nav-button-disabled");
+      } else {
+        prev.classList.add("geocam-nav-button-disabled");
+      }
+    });
+
+    nextUnsub = this.next((val) => {
+      if (val) {
+        next.classList.remove("geocam-nav-button-disabled");
+      } else {
+        next.classList.add("geocam-nav-button-disabled");
+      }
+    });
   };
 
+  const handleKey = function (e) {
+    const forward = e.key === "ArrowUp" || e.key === "w";
+    const back = e.key === "ArrowDown" || e.key === "s";
+    if (forward || back) {
+      forward ?  nextClick() : prevClick();
+      e.stopPropagation();
+    }
+  };
+  
+  document.addEventListener("keydown", handleKey);
+
   this.destroy = function () {
+    document.removeEventListener("keydown", handleKey);
+    prevUnsub();
+    nextUnsub();
     viewer.wrapper.removeChild(next);
     viewer.wrapper.removeChild(prev);
   };
