@@ -1,19 +1,19 @@
-const a = (t, e = {}, n = "") => {
-  const r = document.createElement(t);
-  for (let o in e)
-    r.setAttribute(o, e[o]);
+const u = (o, e = {}, n = "") => {
+  const r = document.createElement(o);
+  for (let t in e)
+    r.setAttribute(t, e[t]);
   return r.innerHTML = n, r;
-}, m = (t, e) => (document.getElementById(t) || document.getElementsByTagName("head")[0].prepend(a("STYLE", { type: "text/css" }, e)), !0), g = function(t) {
-  let e = t, n = [];
-  return function(o, l = {}) {
-    return arguments.length > 0 ? typeof o == "function" ? (l.prepend ? n.unshift(o) : n.push(o), l.dontCallOnRegistration || o(e), () => {
-      const c = n.indexOf(o);
-      c !== -1 && n.splice(c, 1);
-    }) : (e !== o && JSON.stringify(e) !== JSON.stringify(o) && (e = o, n.forEach((c) => c(e))), e) : e;
+}, v = (o, e) => (document.getElementById(o) || document.getElementsByTagName("head")[0].prepend(u("STYLE", { type: "text/css" }, e)), !0), g = function(o) {
+  let e = o, n = [];
+  return function(t, l = {}) {
+    return arguments.length > 0 ? typeof t == "function" ? (l.prepend ? n.unshift(t) : n.push(t), l.dontCallOnRegistration || t(e), () => {
+      const s = n.indexOf(t);
+      s !== -1 && n.splice(s, 1);
+    }) : (e !== t && JSON.stringify(e) !== JSON.stringify(t) && (e = t, n.forEach((s) => s(e))), e) : e;
   };
 }, p = function() {
-  let t, e, n, r, o;
-  this.prev = g(), this.next = g(), m("prev-next-controls", `
+  let o, e, n, r, t;
+  this.prev = g(), this.next = g(), v("prev-next-controls", `
 
     .geocam-nav-button-disabled {
       cursor: auto;
@@ -28,53 +28,63 @@ const a = (t, e = {}, n = "") => {
       background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 13.793l7-7 7 7v1.414l-7-7-7 7z"/><path fill="none" d="M0 0h24v24H0z"/></svg>');
     }
   `);
-  const c = (i) => {
-    const s = this.prev();
-    s && t.shot(s);
-  }, d = (i) => {
-    const s = this.next();
-    s && t.shot(s);
+  const s = (c) => {
+    const i = this.prev();
+    i && o.shot(i);
+  }, a = (c) => {
+    const i = this.next();
+    i && o.shot(i);
   };
-  this.init = function(i) {
-    t = i, e = a("DIV", {
+  this.init = function(c) {
+    o = c, e = u("DIV", {
       class: "geocam-nav-button geocam-prev-button geocam-viewer-control-button geocam-nav-button-disabled",
       title: "go to previous shot in sequence"
-    }), t.addControl(e, "bottom"), n = a("DIV", {
+    }), o.addControl(e, "bottom"), n = u("DIV", {
       class: "geocam-nav-button geocam-next-button geocam-viewer-control-button geocam-nav-button-disabled",
       title: "go to next shot in sequence"
-    }), t.addControl(n, "bottom"), e.addEventListener("click", c, !1), n.addEventListener("click", d, !1), r = this.prev((s) => {
-      s ? e.classList.remove("geocam-nav-button-disabled") : e.classList.add("geocam-nav-button-disabled");
-    }), o = this.next((s) => {
-      s ? n.classList.remove("geocam-nav-button-disabled") : n.classList.add("geocam-nav-button-disabled");
+    }), o.addControl(n, "bottom"), e.addEventListener("click", s, !1), n.addEventListener("click", a, !1), r = this.prev((i) => {
+      i ? e.classList.remove("geocam-nav-button-disabled") : e.classList.add("geocam-nav-button-disabled");
+    }), t = this.next((i) => {
+      i ? n.classList.remove("geocam-nav-button-disabled") : n.classList.add("geocam-nav-button-disabled");
     });
   };
-  const u = function(i) {
-    const s = i.key === "ArrowUp" || i.key === "w", v = i.key === "ArrowDown" || i.key === "s";
-    (s || v) && (s ? d() : c(), i.stopPropagation());
+  const d = function(c) {
+    const i = c.key === "ArrowUp" || c.key === "w", h = c.key === "ArrowDown" || c.key === "s";
+    (i || h) && (i ? a() : s(), c.stopPropagation());
   };
-  document.addEventListener("keydown", u), this.destroy = function() {
-    document.removeEventListener("keydown", u), r(), o(), t.wrapper.removeChild(n), t.wrapper.removeChild(e);
+  document.addEventListener("keydown", d), this.destroy = function() {
+    document.removeEventListener("keydown", d), r(), t(), o.wrapper.removeChild(n), o.wrapper.removeChild(e);
   };
 };
-class b extends HTMLElement {
+class m extends HTMLElement {
+  static get observedAttributes() {
+    return ["prev", "next"];
+  }
   constructor() {
     super(), this.plugin = null, console.log("prev-next-control init");
+  }
+  attributeChangedCallback(e, n, r) {
+    console.log("attribute changed", e, r);
+    const t = function(l, s) {
+      console.log("debouceAttrChange", l, s), this.plugin ? (console.log("setting", l, s), (l == "prev" ? this.prev : this.next)(s)) : setTimeout(() => t(l, s), 100);
+    };
+    t(e, r);
   }
   connectedCallback() {
     console.log("prev-next-control connected");
     const e = this.parentNode;
-    e.viewer && e.viewer.plugin ? (this.plugin = new p(), e.viewer.plugin(this.plugin)) : console.error(
-      "GeocamViewerCompassNeedle must be a child of GeocamViewer"
+    this.viewer = e.viewer, this.viewer && this.viewer.plugin ? (this.plugin = new p(), this.viewer.plugin(this.plugin), this.shot = this.viewer.shot, this.prev = this.plugin.prev, this.next = this.plugin.next) : console.error(
+      "GeocamViewerPreVNext must be a child of GeocamViewer"
     );
   }
   disconnectedCallback() {
-    this.plugin = null, console.log("prev-next-control disconnected");
+    this.prev = null, this.next = null, this.plugin = null, this.shot = null, this.viewer = null, console.log("prev-next-control disconnected");
   }
 }
 window.customElements.define(
   "geocam-viewer-prev-next-control",
-  b
+  m
 );
 export {
-  b as GeocamViewerPrevNextControl
+  m as GeocamViewerPrevNextControl
 };
