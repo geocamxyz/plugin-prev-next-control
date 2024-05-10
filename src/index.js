@@ -34,7 +34,7 @@ export class GeocamViewerPrevNextControl extends HTMLElement {
     console.log("prev-next-control connected");
     const node = this;
     const parent = this.parentNode;
-    this.viewer = this.viewer;
+    this.viewer = parent.viewer;
     if (this.viewer && this.viewer.plugin) {
       // Call a method on the parent
       this.plugin = new prevNextControl();
@@ -44,7 +44,7 @@ export class GeocamViewerPrevNextControl extends HTMLElement {
       this.next = this.plugin.next;
     } else {
       console.error(
-        "GeocamViewerCompassNeedle must be a child of GeocamViewer"
+        "GeocamViewerPreVNext must be a child of GeocamViewer"
       );
     }
   }
