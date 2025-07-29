@@ -118,6 +118,7 @@ export const prevNextControl = function () {
   };
 
   const handleKey = function (e) {
+    if (e.target.closest('input')) return;
     const forward = e.key === "ArrowUp" || e.key === "w";
     const back = e.key === "ArrowDown" || e.key === "s";
     if (forward || back) {
