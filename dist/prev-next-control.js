@@ -49,7 +49,7 @@ const u = (o, e = {}, n = "") => {
     });
   };
   const d = function(c) {
-    if (c.target.closest("input"))
+    if (c.target.closest("input,calcite-input"))
       return;
     const i = c.key === "ArrowUp" || c.key === "w", h = c.key === "ArrowDown" || c.key === "s";
     (i || h) && (i ? a() : s(), c.stopPropagation());
