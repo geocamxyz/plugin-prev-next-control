@@ -32,21 +32,29 @@ export class GeocamViewerPrevNextControl extends HTMLElement {
 
   connectedCallback() {
     console.log("prev-next-control connected");
-    const node = this;
-    const parent = this.parentNode;
-    this.viewer = parent.viewer;
-    if (this.viewer && this.viewer.plugin) {
-      // Call a method on the parent
-      this.plugin = new prevNextControl();
-      this.viewer.plugin(this.plugin);
-      this.shot = this.viewer.shot;
-      this.prev = this.plugin.prev;
-      this.next = this.plugin.next;
-    } else {
+    const host = this.closest("geocam-viewer");
+    if (!host) {
       console.error(
         "GeocamViewerPreVNext must be a child of GeocamViewer"
       );
+      return;
     }
+
+    const attach = () => {
+      const viewer = host.viewer;
+      if (viewer && typeof viewer.plugin === "function") {
+        this.viewer = viewer;
+        this.plugin = new prevNextControl();
+        this.viewer.plugin(this.plugin);
+        this.shot = this.viewer.shot;
+        this.prev = this.plugin.prev;
+        this.next = this.plugin.next;
+      } else {
+        setTimeout(attach, 50);
+      }
+    };
+
+    attach();
   }
 
   disconnectedCallback() {
